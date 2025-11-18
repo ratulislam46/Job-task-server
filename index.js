@@ -20,15 +20,24 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-
-        const userData = client.db('studen-hub').collection("userData");
+        const usersDataCollection = client.db('studen-hub').collection("userData");
 
         app.post('/users-data', async (req, res) => {
             const data = req.body;
             // console.log(data);
-            const result = await userData.insertOne(data);
+            const result = await usersDataCollection.insertOne(data);
             res.send(result)
         })
+
+        app.get('/all-users-data', async (req, res) => {
+            try {
+                const users = await usersDataCollection.find().toArray();
+                res.send(users);
+            } catch (error) {
+                console.error(error);
+                res.send({ message: "Internal Server Error" });
+            }
+        });
 
         app.get('/', (req, res) => {
             res.send('6 senses server side is running.');
